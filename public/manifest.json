@@ -1,0 +1,34 @@
+[
+  {
+    "artist": "Brown Mellow",
+    "cover": "/Brown Mellow/Artist Profile.jpg",
+    "tracks": [
+      {
+        "name": "Underwater Glow",
+        "url": "/Brown Mellow/Music/Underwater Glow.mp3",
+        "picture": "/Brown Mellow/Thumbnail/Underwater Glow.jpg"
+      }
+    ]
+  },
+  {
+    "artist": "JK",
+    "cover": "/JK/Artist Profile.jpg",
+    "tracks": []
+  },
+  {
+    "artist": "Kim Moongo",
+    "cover": "/Kim Moongo/Artist Profile.jpg",
+    "tracks": [
+      {
+        "name": "I Miss You",
+        "url": "/Kim Moongo/Music/I Miss You.mp3",
+        "picture": "/Kim Moongo/Thumbnail/I Miss You.jpg"
+      },
+      {
+        "name": "Summer Rain",
+        "url": "/Kim Moongo/Music/Summer Rain.mp3",
+        "picture": "/Kim Moongo/Thumbnail/Summer Rain.jpg"
+      }
+    ]
+  }
+]
