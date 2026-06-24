@@ -177,9 +177,10 @@ function samplePixels(imageData: ImageData): RGB[] {
 
     const hsl = rgbToHsl(r, g, b);
 
-    // Filter out near-gray, near-black, near-white
-    if (hsl.s < 0.05) continue;
-    if (hsl.l < 0.03 || hsl.l > 0.95) continue;
+    // Filter out truly achromatic, near-black, near-white
+    // Relaxed thresholds to preserve warm/muted tones common in lofi art
+    if (hsl.s < 0.12 && (hsl.l < 0.15 || hsl.l > 0.85)) continue; // gray in extreme range
+    if (hsl.l < 0.08 || hsl.l > 0.92) continue;
 
     pixels.push({ r, g, b });
   }
@@ -201,41 +202,47 @@ function hueDiff(a: number, b: number): number {
 function validateHarmony(colors: RGB[]): RGB[] {
   const hslColors = colors.map((c) => rgbToHsl(c.r, c.g, c.b));
 
-  // Check if all hues are within 30° — monochromatic
+  // Check if all hues are within 30° — monochromatic palette
   const allClose =
     hueDiff(hslColors[0].h, hslColors[1].h) < 30 &&
     hueDiff(hslColors[0].h, hslColors[2].h) < 30 &&
     hueDiff(hslColors[1].h, hslColors[2].h) < 30;
 
   if (allClose) {
-    // Generate analogous + split-complementary spread
-    hslColors[1] = { ...hslColors[1], h: (hslColors[0].h + 40) % 360 };
-    hslColors[2] = { ...hslColors[2], h: (hslColors[0].h + 300) % 360 }; // -60°
+    // DON'T replace hues — keep the natural palette true to the album art.
+    // Instead, spread saturation and lightness so the gradient is still
+    // visually interesting even with a narrow hue range.
+    hslColors[0].s = Math.min(1, hslColors[0].s * 1.2 + 0.05);
+    hslColors[1].s = Math.max(0.15, hslColors[1].s * 0.8);
+    // Spread lightness more aggressively for monochromatic palettes
+    hslColors[0].l = Math.min(0.72, Math.max(0.40, hslColors[0].l + 0.08));
+    hslColors[1].l = Math.min(0.60, Math.max(0.30, hslColors[1].l - 0.05));
+    hslColors[2].l = Math.min(0.30, Math.max(0.08, hslColors[2].l - 0.10));
   }
 
-  // Ensure contrast between pairs — ΔLightness > 0.15
+  // Ensure contrast between pairs — ΔLightness > 0.12
   for (let i = 0; i < hslColors.length; i++) {
     for (let j = i + 1; j < hslColors.length; j++) {
       const dl = Math.abs(hslColors[i].l - hslColors[j].l);
-      if (dl < 0.15) {
+      if (dl < 0.12) {
         // Push them apart
         if (hslColors[i].l > hslColors[j].l) {
-          hslColors[i].l = Math.min(0.65, hslColors[i].l + 0.1);
-          hslColors[j].l = Math.max(0.1, hslColors[j].l - 0.1);
+          hslColors[i].l = Math.min(0.72, hslColors[i].l + 0.08);
+          hslColors[j].l = Math.max(0.08, hslColors[j].l - 0.08);
         } else {
-          hslColors[j].l = Math.min(0.65, hslColors[j].l + 0.1);
-          hslColors[i].l = Math.max(0.1, hslColors[i].l - 0.1);
+          hslColors[j].l = Math.min(0.72, hslColors[j].l + 0.08);
+          hslColors[i].l = Math.max(0.08, hslColors[i].l - 0.08);
         }
       }
     }
   }
 
-  // Dark UI adaptation — raised floors so dark album art still produces vibrant gradients:
-  // color1 (primary) and color2 (secondary): lightness 0.35–0.70
-  // color3 (accent/deepest): lightness 0.10–0.25
-  hslColors[0] = clampLightness(hslColors[0], 0.35, 0.70);
-  hslColors[1] = clampLightness(hslColors[1], 0.35, 0.70);
-  hslColors[2] = clampLightness(hslColors[2], 0.10, 0.25);
+  // Wider lightness ranges — let the art's natural tones come through
+  // color1 (primary) and color2 (secondary): lightness 0.25–0.75
+  // color3 (accent/deepest): lightness 0.08–0.35
+  hslColors[0] = clampLightness(hslColors[0], 0.25, 0.75);
+  hslColors[1] = clampLightness(hslColors[1], 0.25, 0.75);
+  hslColors[2] = clampLightness(hslColors[2], 0.08, 0.35);
 
   return hslColors.map((hsl) => hslToRgb(hsl.h, hsl.s, hsl.l));
 }
@@ -244,8 +251,13 @@ function validateHarmony(colors: RGB[]): RGB[] {
 
 function scoreBucket(bucket: ColorBucket): number {
   const hsl = rgbToHsl(bucket.average.r, bucket.average.g, bucket.average.b);
-  // Favor: common colors × vibrant saturation × mid-range lightness
-  return bucket.population * hsl.s * (1 - Math.abs(hsl.l - 0.5));
+  // Weight saturation more heavily so distinctive accent colors aren't lost
+  // beneath large neutral areas. Use sqrt(population) to dampen the effect
+  // of massive uniform regions (e.g., plain backgrounds).
+  const popWeight = Math.sqrt(bucket.population);
+  const satWeight = hsl.s * 1.5 + 0.1; // boost saturation influence
+  const lumWeight = 1 - Math.abs(hsl.l - 0.45) * 1.2; // favor slightly darker mid-tones
+  return popWeight * satWeight * Math.max(0.05, lumWeight);
 }
 
 function selectTopColors(buckets: ColorBucket[]): RGB[] {
@@ -264,8 +276,8 @@ function selectTopColors(buckets: ColorBucket[]): RGB[] {
 
 // ─── Main Extraction ─────────────────────────────────────────────────────────
 
-const SAMPLE_SIZE = 64;
-const MEDIAN_CUT_DEPTH = 3; // 2^3 = 8 buckets
+const SAMPLE_SIZE = 128;
+const MEDIAN_CUT_DEPTH = 4; // 2^4 = 16 buckets for finer color granularity
 
 // Cache to avoid re-extracting for the same image
 const paletteCache = new Map<string, ColorPalette>();
