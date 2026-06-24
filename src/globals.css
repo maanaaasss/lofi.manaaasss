@@ -4,4 +4,6 @@
 
 body {
     font-family: 'Inter Variable', sans-serif;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
 }

@@ -114,7 +114,7 @@ export default function MusicPlayer() {
         ease: "easeInOut",
         duration: 0.5,
       }}
-      className="relative flex flex-col h-svh px-12 py-12 z-[2] text-purple-100 md:px-24 md:py-16"
+      className="relative flex flex-col h-svh px-5 py-6 sm:px-8 sm:py-8 md:px-12 md:py-12 lg:px-24 lg:py-16 z-[2] text-purple-100"
       onMouseDown={onClick}
     >
       {/* Top row: Title (left) + Menu (right) */}
@@ -126,13 +126,13 @@ export default function MusicPlayer() {
       {/* Bottom row: Song info + Timeline (left) + Visualizer (right) */}
       <div
         data-trigger={true}
-        className="flex items-end justify-between mt-auto gap-6"
+        className="flex flex-col md:flex-row items-start md:items-end justify-between mt-auto gap-4 md:gap-6"
       >
-        <div className="flex flex-col gap-3 max-w-[600px] flex-1" data-trigger-container={true}>
+        <div className="flex flex-col gap-3 w-full md:max-w-[600px] md:flex-1 order-2 md:order-1" data-trigger-container={true}>
           <AnimatePresence mode="wait" initial={false}>
             {currentSong ? <SongDisplay song={currentSong} /> : null}
           </AnimatePresence>
-          <div className="flex items-center gap-3 ml-3">
+          <div className="flex items-center gap-3 ml-1 sm:ml-3">
             <div className="flex-1">
               <Timeline musicManager={musicManager} durationRef={timelineRef} />
             </div>
@@ -141,10 +141,10 @@ export default function MusicPlayer() {
             </p>
           </div>
         </div>
-        <div className="w-full max-w-[300px]" data-trigger-container={true}>
+        <div className="w-full max-w-full md:max-w-[300px] order-1 md:order-2" data-trigger-container={true}>
           {musicManager && (
             <MusicVisualizer
-              className="w-full h-[120px]"
+              className="w-full h-[60px] sm:h-[80px] md:h-[120px]"
               analyser={musicManager.analyser}
               fftSize={4096}
               barWidth={2}
@@ -191,7 +191,7 @@ function Menu({ musicManager }: { musicManager: MusicManager }) {
         className={cn(
           buttonVariants({
             variant: "ghost",
-            className: "max-md:absolute max-md:top-8 max-md:right-8",
+            className: "max-md:absolute max-md:top-5 max-md:right-5 sm:max-md:top-8 sm:max-md:right-8",
           }),
         )}
       >
@@ -427,14 +427,14 @@ function SongDisplay({ song }: { song: QueueItem }) {
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: -10, opacity: 0 }}
       transition={{ ease: "easeInOut", duration: 0.3 }}
-      className="flex flex-row items-center gap-4 rounded-xl p-3"
+      className="flex flex-row items-center gap-3 sm:gap-4 rounded-xl p-2 sm:p-3"
     >
       {song.picture && (
-        <img alt="picture" src={song.picture} className="size-20 rounded-lg object-cover" />
+        <img alt="picture" src={song.picture} className="size-14 sm:size-16 md:size-20 rounded-lg object-cover" />
       )}
       <div>
-        <p className="font-medium">{song.name}</p>
-        <p className="text-xs text-purple-200">{song.author}</p>
+        <p className="font-medium text-sm sm:text-base truncate max-w-[180px] sm:max-w-none">{song.name}</p>
+        <p className="text-xs text-purple-200 truncate max-w-[180px] sm:max-w-none">{song.author}</p>
       </div>
     </motion.div>
   );
@@ -445,9 +445,9 @@ function AnimatedTitle({ text }: { text: string }) {
   let index = 0;
 
   return (
-    <h1 className="text-6xl font-light leading-[0.9] tracking-[-0.1em] md:text-8xl md:leading-[0.9] md:tracking-[-0.1em] whitespace-nowrap">
+    <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-light leading-[0.9] tracking-[-0.06em] sm:tracking-[-0.1em]">
       {words.map((word, i) => (
-        <motion.span key={i} className="inline-block mr-6 break-keep">
+        <motion.span key={i} className="inline-block mr-3 sm:mr-4 md:mr-6 break-keep">
           {word.split("").map((c, j) => (
             <motion.span
               key={`${c}-${j}`}
