@@ -4,9 +4,9 @@
     "cover": "/Brown Mellow/Artist Profile.jpg",
     "tracks": [
       {
-        "name": "Spring Café",
-        "url": "/Brown Mellow/Music/Spring Café.mp3",
-        "picture": "/Brown Mellow/Thumbnail/Spring Café.jpg"
+        "name": "Spring Cafe",
+        "url": "/Brown Mellow/Music/Spring Cafe.mp3",
+        "picture": "/Brown Mellow/Thumbnail/Spring Cafe.jpg"
       },
       {
         "name": "Underwater Glow",
