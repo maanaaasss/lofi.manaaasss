@@ -55,11 +55,12 @@ export async function generateManifest() {
     const thumbFiles = await getFiles(thumbDir);
 
     // Index thumbnails by base name for matching
+    // Normalize to NFC so precomposed/decomposed Unicode variants match
     const thumbMap = new Map();
     for (const t of thumbFiles) {
       const ext = path.extname(t).toLowerCase().slice(1);
       if (!IMAGE_FORMATS.includes(ext)) continue;
-      const base = path.basename(t, path.extname(t));
+      const base = path.basename(t, path.extname(t)).normalize("NFC");
       thumbMap.set(base, `/${entry}/Thumbnail/${t}`);
     }
 
@@ -68,7 +69,7 @@ export async function generateManifest() {
       const ext = path.extname(file).toLowerCase().slice(1);
       if (!AUDIO_FORMATS.includes(ext)) continue;
 
-      const base = path.basename(file, path.extname(file));
+      const base = path.basename(file, path.extname(file)).normalize("NFC");
       tracks.push({
         name: base,
         url: `/${entry}/Music/${file}`,

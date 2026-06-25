@@ -172,7 +172,7 @@ export default function MusicPlayer() {
           ease: "easeInOut",
           duration: 1,
         }}
-        style={{ filter: "brightness(0.7)" }}
+        style={{ filter: "none" }}
       >
         <Gradient colors={palette} />
       </motion.div>

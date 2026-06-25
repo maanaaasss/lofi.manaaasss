@@ -177,9 +177,9 @@ function samplePixels(imageData: ImageData): RGB[] {
 
     const hsl = rgbToHsl(r, g, b);
 
-    // Filter out truly achromatic, near-black, near-white
-    // Relaxed thresholds to preserve warm/muted tones common in lofi art
-    if (hsl.s < 0.12 && (hsl.l < 0.15 || hsl.l > 0.85)) continue; // gray in extreme range
+    // Only reject near-black and near-white extremes.
+    // Low-saturation mid-tones (tans, beiges, pastels) are intentionally
+    // preserved — they dominate lo-fi covers and should drive the palette.
     if (hsl.l < 0.08 || hsl.l > 0.92) continue;
 
     pixels.push({ r, g, b });
@@ -249,21 +249,32 @@ function validateHarmony(colors: RGB[]): RGB[] {
 
 // ─── Score & Select ──────────────────────────────────────────────────────────
 
-function scoreBucket(bucket: ColorBucket): number {
+function scoreBucket(bucket: ColorBucket, minPopThreshold: number): number {
+  // Reject tiny color clusters — rogue vibrant pixels (e.g. a single bright
+  // red leaf on an otherwise muted cover) should never win a top-3 spot.
+  if (bucket.population < minPopThreshold) return 0;
+
   const hsl = rgbToHsl(bucket.average.r, bucket.average.g, bucket.average.b);
-  // Weight saturation more heavily so distinctive accent colors aren't lost
-  // beneath large neutral areas. Use sqrt(population) to dampen the effect
-  // of massive uniform regions (e.g., plain backgrounds).
-  const popWeight = Math.sqrt(bucket.population);
-  const satWeight = hsl.s * 1.5 + 0.1; // boost saturation influence
-  const lumWeight = 1 - Math.abs(hsl.l - 0.45) * 1.2; // favor slightly darker mid-tones
+  // Population-first scoring: the true dominant color should win.
+  // sqrt(saturation) gently rewards vivid tones without letting a
+  // small vibrant patch outrank a large muted area.
+  // Lightness proximity favors darker mid-tones (0.35–0.55) that
+  // interact well with the noisy waterPlane shader.
+  const popWeight = bucket.population;
+  const satWeight = Math.sqrt(hsl.s + 0.01); // +0.01 to avoid 0^0.5 edge case
+  const lumWeight = 1 - Math.abs(hsl.l - 0.45) * 1.2;
   return popWeight * satWeight * Math.max(0.05, lumWeight);
 }
 
 function selectTopColors(buckets: ColorBucket[]): RGB[] {
+  // Minimum population threshold: 2% of total valid pixels.
+  // Filters out rogue micro-details that are statistically insignificant.
+  const totalPixels = buckets.reduce((sum, b) => sum + b.population, 0);
+  const minPopThreshold = Math.ceil(totalPixels * 0.02);
+
   const scored = buckets
     .filter((b) => b.population > 0)
-    .sort((a, b) => scoreBucket(b) - scoreBucket(a));
+    .sort((a, b) => scoreBucket(b, minPopThreshold) - scoreBucket(a, minPopThreshold));
 
   // Pick the top 3, falling back to duplicates if fewer than 3
   const result: RGB[] = [];
@@ -272,6 +283,39 @@ function selectTopColors(buckets: ColorBucket[]): RGB[] {
   }
 
   return result;
+}
+
+// ─── Lo-Fi HSL Clamp ─────────────────────────────────────────────────────────
+
+type ColorRole = "primary" | "secondary" | "accent";
+
+/**
+ * Role-based lightness clamp for the noisy waterPlane shader.
+ * Each role serves a different depth layer of the gradient wave:
+ *   - primary:  surface highlight — must show grain texture
+ *   - secondary: mid-depth body — bridges highlight and shadow
+ *   - accent:   deep shadow — gives the wave its 3D volume
+ * Saturation is capped at 45% for all roles to keep the earthy lo-fi tone.
+ */
+const ROLE_LIGHTNESS: Record<ColorRole, [number, number]> = {
+  primary: [0.35, 0.60],
+  secondary: [0.20, 0.40],
+  accent: [0.10, 0.25],
+};
+
+function clampToLoFi(hex: string, role: ColorRole): string {
+  const { r, g, b } = hexToRgb(hex);
+  const hsl = rgbToHsl(r, g, b);
+
+  // Keep the hue exactly as extracted
+  // Cap saturation at 45% — enforces earthy, desaturated tone
+  hsl.s = Math.min(hsl.s, 0.45);
+  // Apply role-specific lightness range
+  const [minL, maxL] = ROLE_LIGHTNESS[role];
+  hsl.l = Math.max(minL, Math.min(maxL, hsl.l));
+
+  const clamped = hslToRgb(hsl.h, hsl.s, hsl.l);
+  return rgbToHex(clamped);
 }
 
 // ─── Main Extraction ─────────────────────────────────────────────────────────
@@ -318,9 +362,9 @@ export function extractPalette(imageUrl: string): Promise<ColorPalette> {
         const harmonized = validateHarmony(topColors);
 
         const palette: ColorPalette = {
-          primary: rgbToHex(harmonized[0]),
-          secondary: rgbToHex(harmonized[1]),
-          accent: rgbToHex(harmonized[2]),
+          primary: clampToLoFi(rgbToHex(harmonized[0]), "primary"),
+          secondary: clampToLoFi(rgbToHex(harmonized[1]), "secondary"),
+          accent: clampToLoFi(rgbToHex(harmonized[2]), "accent"),
         };
 
         paletteCache.set(imageUrl, palette);

@@ -54,7 +54,7 @@ export function Gradient({ colors }: { colors: ColorPalette }) {
     <GradientCanvas>
       <ShaderGradient
         animate="on"
-        brightness={1}
+        brightness={1.5}
         cAzimuthAngle={180}
         cDistance={2.8}
         cPolarAngle={80}
