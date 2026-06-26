@@ -18,6 +18,12 @@ import {
 import { cn } from "@/lib/cn";
 import { buttonVariants } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import {
+  addListeningTime,
+  getListeningTime,
+  formatListeningTime,
+  flushOnUnload,
+} from "@/lib/time-tracker";
 
 export default function MusicPlayer() {
   const timelineRef = useRef<DurationControl>();
@@ -27,9 +33,20 @@ export default function MusicPlayer() {
   // trigger re-renders
   const [, setDigit] = useState(0);
   const [palette, setPalette] = useState<ColorPalette>(DEFAULT_PALETTE);
+  const [listeningHours, setListeningHours] = useState(() =>
+    formatListeningTime(getListeningTime()),
+  );
+  const lastTrackedRef = useRef<number>(0);
+  const lastReportedTimeRef = useRef<number>(-1);
 
   const paused = musicManager?.isPaused() ?? true;
   const currentSong = musicManager?.queueManager.getCurrentSong();
+
+  // Flush accumulated time to localStorage on page unload
+  useEffect(() => {
+    window.addEventListener("beforeunload", flushOnUnload);
+    return () => window.removeEventListener("beforeunload", flushOnUnload);
+  }, []);
 
   // Extract colors from album art when the song changes
   useEffect(() => {
@@ -49,11 +66,31 @@ export default function MusicPlayer() {
         }
 
         timelineRef.current?.((currentTime / duration) * 100);
+
+        // Only count naturally played time — detect seeks by checking delta
+        const last = lastReportedTimeRef.current;
+        lastReportedTimeRef.current = currentTime;
+
+        if (last >= 0) {
+          const delta = currentTime - last;
+          // Natural playback: delta ~1s (0.5–2s tolerance)
+          // Seek or gap: delta outside that range — skip counting
+          if (delta > 0.5 && delta < 2) {
+            addListeningTime(delta);
+          }
+        }
+
+        const now = Date.now();
+        if (now - lastTrackedRef.current >= 30_000) {
+          lastTrackedRef.current = now;
+          setListeningHours(formatListeningTime(getListeningTime()));
+        }
       },
       onStateChange: () => {
         setDigit((prev) => prev + 1);
       },
       onNext() {
+        lastReportedTimeRef.current = -1;
         setDigit((prev) => prev + 1);
       },
       onSongListUpdated() {
@@ -120,7 +157,9 @@ export default function MusicPlayer() {
       {/* Top row: Title (left) + Menu (right) */}
       <div className="flex items-start justify-between" data-trigger-container={true}>
         <AnimatedTitle text={paused ? "Click to Play" : "lofi.manaaasss"} />
-        {musicManager && <Menu musicManager={musicManager} />}
+        {musicManager && (
+          <Menu musicManager={musicManager} listeningHours={listeningHours} />
+        )}
       </div>
 
       {/* Bottom row: Song info + Timeline (left) + Visualizer (right) */}
@@ -182,7 +221,7 @@ export default function MusicPlayer() {
 
 // ─── Menu with Album Browsing ────────────────────────────────────────────────
 
-function Menu({ musicManager }: { musicManager: MusicManager }) {
+function Menu({ musicManager, listeningHours }: { musicManager: MusicManager; listeningHours: string }) {
   return (
     <Popover>
       <PopoverTrigger
@@ -217,7 +256,7 @@ function Menu({ musicManager }: { musicManager: MusicManager }) {
         sideOffset={8}
         className="!bg-black/30 !backdrop-blur-2xl !border-white/10"
       >
-        <AlbumList musicManager={musicManager} />
+        <AlbumList musicManager={musicManager} listeningHours={listeningHours} />
         <PlayerControls musicManager={musicManager} />
       </PopoverContent>
     </Popover>
@@ -226,7 +265,7 @@ function Menu({ musicManager }: { musicManager: MusicManager }) {
 
 // ─── Album List ──────────────────────────────────────────────────────────────
 
-function AlbumList({ musicManager }: { musicManager: MusicManager }) {
+function AlbumList({ musicManager, listeningHours }: { musicManager: MusicManager; listeningHours: string }) {
   const albums = getAlbums();
   const playAlbum = (artist: string) => {
     const tracks = getArtistTracks(artist);
@@ -275,32 +314,50 @@ function AlbumList({ musicManager }: { musicManager: MusicManager }) {
         );
       })}
 
-      {/* Shuffle All */}
-      <button
-        className={cn(
-          buttonVariants({ variant: "secondary" }),
-          "mt-2 gap-2",
-        )}
-        onClick={shuffleAll}
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+      {/* Shuffle All + Hours Spent */}
+      <div className="flex items-center justify-start mt-2 gap-3 mb-4 w-full">
+        <button
+          className={cn(
+            buttonVariants({ variant: "secondary" }),
+            "py-1.5 px-4 rounded-full gap-2 flex-1 justify-center",
+          )}
+          onClick={shuffleAll}
         >
-          <polyline points="16 3 21 3 21 8" />
-          <line x1="4" x2="21" y1="20" y2="3" />
-          <polyline points="21 16 21 21 16 21" />
-          <line x1="15" x2="21" y1="15" y2="21" />
-          <line x1="4" x2="9" y1="4" y2="9" />
-        </svg>
-        Shuffle All
-      </button>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="16 3 21 3 21 8" />
+            <line x1="4" x2="21" y1="20" y2="3" />
+            <polyline points="21 16 21 21 16 21" />
+            <line x1="15" x2="21" y1="15" y2="21" />
+            <line x1="4" x2="9" y1="4" y2="9" />
+          </svg>
+          Shuffle All
+        </button>
+        <div className="inline-flex items-center justify-center gap-1.5 py-1.5 px-4 rounded-full bg-purple-200/10 hover:bg-purple-200/20 text-sm transition-colors flex-1">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <span className="tabular-nums">{listeningHours}</span>
+        </div>
+      </div>
     </div>
   );
 }
