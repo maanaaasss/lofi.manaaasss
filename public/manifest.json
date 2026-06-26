@@ -1,124 +1,112 @@
 [
   {
-    "artist": "Brown Mellow",
-    "cover": "/Brown Mellow/Artist Profile.jpg",
-    "tracks": [
-      {
-        "name": "Coffee Outside",
-        "url": "/Brown Mellow/Music/Coffee Outside.mp3",
-        "picture": "/Brown Mellow/Thumbnail/Coffee Outside.jpg"
-      },
-      {
-        "name": "Deep in Conversation",
-        "url": "/Brown Mellow/Music/Deep in Conversation.mp3",
-        "picture": "/Brown Mellow/Thumbnail/Deep in Conversation.jpg"
-      },
-      {
-        "name": "Flower Garden",
-        "url": "/Brown Mellow/Music/Flower Garden.mp3",
-        "picture": "/Brown Mellow/Thumbnail/Flower Garden.jpg"
-      },
-      {
-        "name": "Late Night Talk",
-        "url": "/Brown Mellow/Music/Late Night Talk.mp3",
-        "picture": "/Brown Mellow/Thumbnail/Late Night Talk.jpg"
-      },
-      {
-        "name": "Library",
-        "url": "/Brown Mellow/Music/Library.mp3",
-        "picture": "/Brown Mellow/Thumbnail/Library.jpg"
-      },
-      {
-        "name": "Morning Coffee Breeze",
-        "url": "/Brown Mellow/Music/Morning Coffee Breeze.mp3",
-        "picture": "/Brown Mellow/Thumbnail/Morning Coffee Breeze.jpg"
-      },
-      {
-        "name": "Smells Delicious",
-        "url": "/Brown Mellow/Music/Smells Delicious.mp3",
-        "picture": "/Brown Mellow/Thumbnail/Smells Delicious.jpg"
-      },
-      {
-        "name": "Spring Cafe",
-        "url": "/Brown Mellow/Music/Spring Cafe.mp3",
-        "picture": "/Brown Mellow/Thumbnail/Spring Cafe.jpg"
-      },
-      {
-        "name": "Underwater Glow",
-        "url": "/Brown Mellow/Music/Underwater Glow.mp3",
-        "picture": "/Brown Mellow/Thumbnail/Underwater Glow.jpg"
-      },
-      {
-        "name": "Walking on White Snow",
-        "url": "/Brown Mellow/Music/Walking on White Snow.mp3",
-        "picture": "/Brown Mellow/Thumbnail/Walking on White Snow.jpg"
-      }
-    ]
-  },
-  {
-    "artist": "JK",
-    "cover": "/JK/Artist Profile.jpg",
-    "tracks": [
-      {
-        "name": "Afternoon",
-        "url": "/JK/Music/Afternoon.mp3",
-        "picture": "/JK/Thumbnail/Afternoon.jpg"
-      },
-      {
-        "name": "I Believe You",
-        "url": "/JK/Music/I Believe You.mp3",
-        "picture": "/JK/Thumbnail/I Believe You.jpg"
-      },
-      {
-        "name": "I Still Think Of You",
-        "url": "/JK/Music/I Still Think Of You.mp3",
-        "picture": "/JK/Thumbnail/I Still Think Of You.jpg"
-      },
-      {
-        "name": "Winter Night",
-        "url": "/JK/Music/Winter Night.mp3",
-        "picture": "/JK/Thumbnail/Winter Night.jpg"
-      }
-    ]
-  },
-  {
-    "artist": "Kim Moongo",
-    "cover": "/Kim Moongo/Artist Profile.jpg",
+    "artist": "Puuung",
+    "cover": "/Puuung/Artist Profile.jpg",
     "tracks": [
       {
         "name": "A Morning Walk",
-        "url": "/Kim Moongo/Music/A Morning Walk.mp3",
-        "picture": "/Kim Moongo/Thumbnail/A Morning Walk.jpg"
+        "url": "/Puuung/Music/A Morning Walk.mp3",
+        "picture": "/Puuung/Thumbnail/A Morning Walk.jpg"
+      },
+      {
+        "name": "Afternoon",
+        "url": "/Puuung/Music/Afternoon.mp3",
+        "picture": "/Puuung/Thumbnail/Afternoon.jpg"
+      },
+      {
+        "name": "Coffee Outside",
+        "url": "/Puuung/Music/Coffee Outside.mp3",
+        "picture": "/Puuung/Thumbnail/Coffee Outside.jpg"
       },
       {
         "name": "Come With Me",
-        "url": "/Kim Moongo/Music/Come With Me.mp3",
-        "picture": "/Kim Moongo/Thumbnail/Come With Me.jpg"
+        "url": "/Puuung/Music/Come With Me.mp3",
+        "picture": "/Puuung/Thumbnail/Come With Me.jpg"
+      },
+      {
+        "name": "Deep in Conversation",
+        "url": "/Puuung/Music/Deep in Conversation.mp3",
+        "picture": "/Puuung/Thumbnail/Deep in Conversation.jpg"
       },
       {
         "name": "Everything Will Be Okay",
-        "url": "/Kim Moongo/Music/Everything Will Be Okay.mp3",
-        "picture": "/Kim Moongo/Thumbnail/Everything Will Be Okay.jpg"
+        "url": "/Puuung/Music/Everything Will Be Okay.mp3",
+        "picture": "/Puuung/Thumbnail/Everything Will Be Okay.jpg"
+      },
+      {
+        "name": "Flower Garden",
+        "url": "/Puuung/Music/Flower Garden.mp3",
+        "picture": "/Puuung/Thumbnail/Flower Garden.jpg"
+      },
+      {
+        "name": "I Believe You",
+        "url": "/Puuung/Music/I Believe You.mp3",
+        "picture": "/Puuung/Thumbnail/I Believe You.jpg"
       },
       {
         "name": "I Miss You",
-        "url": "/Kim Moongo/Music/I Miss You.mp3",
-        "picture": "/Kim Moongo/Thumbnail/I Miss You.jpg"
+        "url": "/Puuung/Music/I Miss You.mp3",
+        "picture": "/Puuung/Thumbnail/I Miss You.jpg"
+      },
+      {
+        "name": "I Still Think Of You",
+        "url": "/Puuung/Music/I Still Think Of You.mp3",
+        "picture": "/Puuung/Thumbnail/I Still Think Of You.jpg"
+      },
+      {
+        "name": "Late Night Talk",
+        "url": "/Puuung/Music/Late Night Talk.mp3",
+        "picture": "/Puuung/Thumbnail/Late Night Talk.jpg"
       },
       {
         "name": "Let's Dance",
-        "url": "/Kim Moongo/Music/Let's Dance.mp3",
-        "picture": "/Kim Moongo/Thumbnail/Let's Dance.jpg"
+        "url": "/Puuung/Music/Let's Dance.mp3",
+        "picture": "/Puuung/Thumbnail/Let's Dance.jpg"
+      },
+      {
+        "name": "Library",
+        "url": "/Puuung/Music/Library.mp3",
+        "picture": "/Puuung/Thumbnail/Library.jpg"
+      },
+      {
+        "name": "Morning Coffee Breeze",
+        "url": "/Puuung/Music/Morning Coffee Breeze.mp3",
+        "picture": "/Puuung/Thumbnail/Morning Coffee Breeze.jpg"
       },
       {
         "name": "On The Way To You",
-        "url": "/Kim Moongo/Music/On The Way To You.mp3",
-        "picture": "/Kim Moongo/Thumbnail/On The Way To You.jpg"
+        "url": "/Puuung/Music/On The Way To You.mp3",
+        "picture": "/Puuung/Thumbnail/On The Way To You.jpg"
+      },
+      {
+        "name": "Smells Delicious",
+        "url": "/Puuung/Music/Smells Delicious.mp3",
+        "picture": "/Puuung/Thumbnail/Smells Delicious.jpg"
+      },
+      {
+        "name": "Spring Cafe",
+        "url": "/Puuung/Music/Spring Cafe.mp3",
+        "picture": "/Puuung/Thumbnail/Spring Cafe.jpg"
       },
       {
         "name": "Summer Rain",
-        "url": "/Kim Moongo/Music/Summer Rain.mp3",
-        "picture": "/Kim Moongo/Thumbnail/Summer Rain.jpg"
+        "url": "/Puuung/Music/Summer Rain.mp3",
+        "picture": "/Puuung/Thumbnail/Summer Rain.jpg"
+      },
+      {
+        "name": "Underwater Glow",
+        "url": "/Puuung/Music/Underwater Glow.mp3",
+        "picture": "/Puuung/Thumbnail/Underwater Glow.jpg"
+      },
+      {
+        "name": "Walking on White Snow",
+        "url": "/Puuung/Music/Walking on White Snow.mp3",
+        "picture": "/Puuung/Thumbnail/Walking on White Snow.jpg"
+      },
+      {
+        "name": "Winter Night",
+        "url": "/Puuung/Music/Winter Night.mp3",
+        "picture": "/Puuung/Thumbnail/Winter Night.jpg"
       }
     ]
   }
