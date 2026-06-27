@@ -65,7 +65,9 @@ export default function MusicPlayer() {
           timeLabelRef.current.innerText = formatSeconds(currentTime);
         }
 
-        timelineRef.current?.((currentTime / duration) * 100);
+        if (duration > 0) {
+          timelineRef.current?.((currentTime / duration) * 100);
+        }
 
         // Only count naturally played time — detect seeks by checking delta
         const last = lastReportedTimeRef.current;
@@ -73,9 +75,7 @@ export default function MusicPlayer() {
 
         if (last >= 0) {
           const delta = currentTime - last;
-          // Natural playback: delta ~1s (0.5–2s tolerance)
-          // Seek or gap: delta outside that range — skip counting
-          if (delta > 0.5 && delta < 2) {
+          if (delta > 0.1 && delta < 5) {
             addListeningTime(delta);
           }
         }
