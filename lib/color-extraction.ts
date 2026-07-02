@@ -19,8 +19,8 @@ export interface ColorPalette {
 }
 
 export const DEFAULT_PALETTE: ColorPalette = {
-  primary: "#606080",
-  secondary: "#8d7dca",
+  primary: "#212121",
+  secondary: "#212121",
   accent: "#212121",
 };
 
