@@ -42,14 +42,18 @@ export async function generateManifest() {
     const artistDir = path.join(publicDir, entry);
     const stat = await fs.stat(artistDir);
 
+
     if (!stat.isDirectory()) continue;
     if (entry === "node_modules" || entry.startsWith(".")) continue;
+
 
     const coverPath = path.join(artistDir, "Artist Profile.jpg");
     const coverExists = await pathExists(coverPath);
 
+
     const musicDir = path.join(artistDir, "Music");
     const thumbDir = path.join(artistDir, "Thumbnail");
+    
 
     const musicFiles = await getFiles(musicDir);
     const thumbFiles = await getFiles(thumbDir);
